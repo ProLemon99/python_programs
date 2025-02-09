@@ -1,7 +1,9 @@
 import time
+
 started = False
 stopped = True
 command = ""
+
 while True:
     command = input("- ").upper()
     if command == "START":

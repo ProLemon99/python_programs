@@ -11,7 +11,6 @@ WIDTH, HEIGHT = 300, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 FPS = 60
 
-
 pygame.init()
 sc = pygame.display.set_mode((RES),pygame.RESIZABLE)
 pygame.display.set_caption("Tetris")
@@ -34,11 +33,11 @@ field = [[0 for i in range(W)] for j in range(H)]
 
 anim_count, anim_speed, anim_limit = 0, 60, 2000
 
-bg = pygame.image.load('img/bg.jpg').convert()
-game_bg = pygame.image.load('img/bg2.jpg').convert()
+bg = pygame.image.load('games/advanced/tetris/img/bg.jpg').convert()
+game_bg = pygame.image.load('games/advanced/tetris/img/bg2.jpg').convert()
 
-main_font = pygame.font.Font('font/font.ttf', 65)
-font = pygame.font.Font('font/font.ttf', 45)
+main_font = pygame.font.Font('games/advanced/tetris/font/font.ttf', 65)
+font = pygame.font.Font('games/advanced/tetris/font/font.ttf', 45)
 
 title_tetris = main_font.render('TETRIS', True, pygame.Color('darkorange'))
 title_score = font.render('score:', True, pygame.Color('green'))
@@ -61,15 +60,15 @@ def check_borders():
 
 def get_record():
     try:
-        with open('record') as f:
+        with open('games/advanced/tetris/records/record') as f:
             return f.readline()
     except FileNotFoundError:
-        with open('record', 'w') as f:
+        with open('games/advanced/tetris/records/record', 'w') as f:
             f.write('0')
 
 def set_record(record, score):
     rec = max(int(record), score)
-    with open('record', 'w') as f:
+    with open('games/advanced/tetris/records/record', 'w') as f:
         f.write(str(rec))
 
 def draw_text(message, x, y):
