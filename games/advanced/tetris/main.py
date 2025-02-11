@@ -12,7 +12,7 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 FPS = 60
 
 pygame.init()
-sc = pygame.display.set_mode((RES),pygame.RESIZABLE)
+sc = pygame.display.set_mode((RES))
 pygame.display.set_caption("Tetris")
 game_sc = pygame.Surface(GAME_RES)
 clock = pygame.time.Clock()
