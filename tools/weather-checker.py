@@ -22,9 +22,6 @@ def fetch_weather(city_name):
         return None
 
 def display_weather_info(weather_data):
-    """
-    Displays weather information from the API response.
-    """
     if weather_data:
         # Extract relevant data from the API response
         location = weather_data["location"]["name"]  # City name
