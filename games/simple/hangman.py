@@ -1,154 +1,175 @@
 import random
 
-HANGMAN = (
+HANGMAN = [
     """
- ------
- |    |
- |
- |
- |
- |
- |
- |
- |
-----------
-""",
-"""
- ------
- |    |
- |    O
- |
- |
- |
- |
- |
- |
-----------
-""",
-"""
- ------
- |    |
- |    O
- |   -+-
- | 
- |   
- |   
- |   
- |   
-----------
-""",
-"""
- ------
- |    |
- |    O
- |  /-+-
- |   
- |   
- |   
- |   
- |   
-----------
-""",
-"""
- ------
- |    |
- |    O
- |  /-+-/
- |   
- |   
- |   
- |   
- |   
-----------
-""",
-"""
- ------
- |    |
- |    O
- |  /-+-/
- |    |
- |   
- |   
- |   
- |   
-----------
-""",
-"""
- ------
- |    |
- |    O
- |  /-+-/
- |    |
- |    |
- |   | 
- |   | 
- |   
-----------
-""",
-"""
- ------
- |    |
- |    O
- |  /-+-/
- |    |
- |    |
- |   | |
- |   | |
- |  
-----------
-""")
+    ------
+    |    |
+    |
+    |
+    |
+    |
+    |
+    |
+    |
+    ----------
+    """,
+    """
+    ------
+    |    |
+    |    O
+    |
+    |
+    |
+    |
+    |
+    |
+    ----------
+    """,
+    """
+    ------
+    |    |
+    |    O
+    |   -+-
+    | 
+    |   
+    |   
+    |   
+    |   
+    ----------
+    """,
+    """
+    ------
+    |    |
+    |    O
+    |  /-+-
+    |   
+    |   
+    |   
+    |   
+    |   
+    ----------
+    """,
+    """
+    ------
+    |    |
+    |    O
+    |  /-+-/
+    |   
+    |   
+    |   
+    |   
+    |   
+    ----------
+    """,
+    """
+    ------
+    |    |
+    |    O
+    |  /-+-/
+    |    |
+    |   
+    |   
+    |   
+    |   
+    ----------
+    """,
+    """
+    ------
+    |    |
+    |    O
+    |  /-+-/
+    |    |
+    |    |
+    |   | 
+    |   | 
+    |   
+    ----------
+    """,
+    """
+    ------
+    |    |
+    |    O
+    |  /-+-/
+    |    |
+    |    |
+    |   | |
+    |   | |
+    |  
+    ----------
+    """
+]
 
 MAX_WRONG = len(HANGMAN) - 1
 
-WORDS = ("APOSTROPHE", "MUSHROOM", "TELEVISION",
-         "GEOMETRY", "RELATABLE", "BRAINROT",
-         "APPLICATION", "VISUALISATION", "PRACTICE")
+WORDS = {
+    "easy": ["PLANET", "BRIDGE", "FROSTY", "CANDLE", "MARKET", "JUMPED", "SILENT", "HUNTER"],
+    "medium": ["APPROACH", "ELEPHANT", "CAMPFIRE", "FANTASY", "TELEGRAM", "VIBRANCE", "RAINBOW"],
+    "hard": ["IMAGINATION", "EXPERIMENTAL", "CONSEQUENCE", "PARTICIPATION", "CELEBRATION", "TECHNOLOGY"]
+}
 
-word = random.choice(WORDS)
-so_far = "-" * len(word)
-wrong = 0
-used = []
+def choose_difficulty():
+    while True:
+        print("\nSelect Difficulty:\n1. Easy\n2. Medium\n3. Hard\n")
+        choice = input("Enter 1, 2, or 3: ").strip()
+        if choice == "1":
+            return "easy"
+        elif choice == "2":
+            return "medium"
+        elif choice == "3":
+            return "hard"
+        else:
+            print("Invalid choice! Please enter 1, 2, or 3.")
 
-print("Welcome to Hangman. Good luck!")
+def play_hangman():
+    difficulty = choose_difficulty()
+    word = random.choice(WORDS[difficulty])  # Select a word from the chosen difficulty
+    so_far = "-" * len(word)  # Masked word
+    wrong = 0
+    used = []  # List of guessed letters
 
-while wrong < MAX_WRONG and so_far != word:
-    print (HANGMAN[wrong])
-    print ("\nYou've used the following letters:\n", used)
-    print ("\nSo far, you have guessed:\t", so_far)
+    print(f"\nYou chose {difficulty.capitalize()} difficulty. Good luck!")
 
-    guess = input("Enter your guess:\t")
-    guess = guess.upper()
+    while wrong < MAX_WRONG and so_far != word:
+        print(HANGMAN[wrong])
+        print("\nUsed letters:", ", ".join(used) if used else "None")
+        print("\nWord progress:\t", so_far)
 
-    while guess in used:
-        print ("You already guessed the letter:\t", guess)
-        guess = input("Guess again:\t")
-        guess = guess.upper()
+        guess = input("\nEnter your guess:\t").upper()
 
-    used.append(guess)
-
-    if guess in word:
-        print ("The letter, ", guess, "is in the word")
-
-        new = ""
-
-        for i in range(len(word)):
-            if guess == word [i]:
-                new += guess
+        while not guess.isalpha() or len(guess) != 1 or guess in used:
+            if guess in used:
+                print("You already guessed that letter!")
             else:
-                new += so_far [i]
-        so_far = new
+                print("Invalid input! Please enter a single letter.")
+            guess = input("Enter your guess:\t").upper()
 
+        used.append(guess)
+
+        if guess in word:
+            print(f"\nGreat! The letter '{guess}' is in the word.")
+            so_far = "".join(guess if word[i] == guess else so_far[i] for i in range(len(word)))
+        else:
+            print(f"\nNope! The letter '{guess}' is not in the word.")
+            wrong += 1
+
+    if wrong == MAX_WRONG:
+        print(HANGMAN[wrong])
+        print("\nYou have been hanged! The word was:", word)
     else:
-        print ("\nSorry,", guess, "isn't in word")
-        wrong += 1
+        print("\nCongratulations! You guessed the word:", word)
 
-if wrong == MAX_WRONG:
-    print(HANGMAN[wrong])
-    print ("You have been hanged :(")
+    replay_or_exit()
 
-else:
-    print("\nCongratulations! You guessed it!")
+def replay_or_exit():
+    while True:
+        choice = input("\nWould you like to play again? (R to replay, E to exit): ").lower()
+        if choice == 'r':
+            play_hangman()  # Restart game
+        elif choice == 'e':
+            print("Thanks for playing! Goodbye.")
+            exit()
+        else:
+            print("Invalid input. Please enter 'R' or 'E'.")
 
-print("\nThe word was", word)
-
-input ("\n\nPress Enter key to exit")
+if __name__ == "__main__":
+    play_hangman()
