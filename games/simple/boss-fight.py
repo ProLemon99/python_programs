@@ -1,136 +1,118 @@
 import random
 import time
-import replit
-sleep = time.sleep
+import os
 
-critchance = random.randint(0,10)
-crit = 2
+# Sleep function for better pacing
+def sleep(duration=1):
+    time.sleep(duration)
 
-defended = random.randint(0,6)
-maxhealth= 35
-bhealthmax = 50
+# Clear screen function for readability
+def clear_screen():
+    os.system("cls" if os.name == "nt" else "clear")
 
-def menu():
-	print("Your Health: {}".format(hp))
-	sleep(1)
-	print("Enemy Health: {}".format(bosshp))
-	sleep(1)
-	print("\n[Attack] - Damages the enemy.\n[Defend] - Chance to block enemies attack.\n[Heal] - Regain some of your health.\n\n")
+# Difficulty settings
+def choose_difficulty():
+    while True:
+        clear_screen()
+        print("=== Choose Difficulty ===")
+        print("[1] Easy  - (More HP, Weaker Boss)")
+        print("[2] Medium - (Balanced)")
+        print("[3] Hard  - (Less HP, Stronger Boss)")
 
-def attack():
-	replit.clear()
-	sleep(0.2)
-	print("You attack the enemy. \n")
-	
-	critdmg = 1
-	sleep(1)
-	
-	if critchance == 10:
-		critdmg = damagedealt * crit
-		
-	print("You dealt {} damage.\n".format(damagedealt * critdmg))
+        choice = input("\nEnter 1, 2, or 3: ").strip()
+        
+        if choice == "1":
+            return 40, 50  # Player HP, Boss HP
+        elif choice == "2":
+            return 30, 55
+        elif choice == "3":
+            return 25, 65
+        else:
+            print("\nInvalid choice. Try again.")
+            sleep(1)
 
-	return damagedealt * critdmg
+# Game introduction
+clear_screen()
+print("=== Welcome to the Boss Fight Game! ===")
+sleep(2)
 
-def defend():
-	replit.clear()
-	sleep(0.2)
-	print("You prepare your defences. \n")
+# Set player and boss health based on difficulty
+player_hp, boss_hp = choose_difficulty()
+max_hp = player_hp
+boss_max_hp = boss_hp
 
-def heal():
-	replit.clear()
-	sleep(0.2)
-	print("You wrap yourself in bandages. \n")
-	sleep(1)
-	print("You gained {} health. \n".format(plushp))
-
-def battack():
-	replit.clear()
-	sleep(0.2)
-	print("The Boss attacks you. \n")
-	sleep(1)
-
-	if prompt == "DEFEND":
-			print("You deflected the attack. \n")
-	else:
-		print("You take {} damage. \n".format(damagetaken))
-
-def bdefend():
-	replit.clear()
-	sleep(0.2)
-	
-	if prompt == "ATTACK":
-			print("The Boss deflected your attack. \n")
-	else:
-		print("The Boss tried to deflect you attack...\n")
-		sleep(1)
-		replit.clear()
-		print("... but it failed")
-
-def bheal():
-	replit.clear()
-	sleep(0.2)
-	print("The Boss regained {} health. \n".format(plusbhp))
-
+# Game loop
 play = True
-hp = 20
-bosshp = 50
+while play:
+    clear_screen()
+    print(f"Your Health: {player_hp}/{max_hp}")
+    print(f"Boss Health: {boss_hp}/{boss_max_hp}\n")
+    print("[A] Attack  |  [D] Defend  |  [H] Heal")
+    
+    # Player's Turn
+    player_action = input("\nChoose your action: ").strip().upper()
+    
+    if player_action == "A":  # Attack
+        clear_screen()
+        damage = random.randint(5, 12)
+        crit_chance = random.randint(1, 10)
+        if crit_chance == 10:  # 10% chance to deal critical hit
+            damage *= 2
+            print("CRITICAL HIT!!")
+        print(f"You attack the boss for {damage} damage!")
+        boss_hp -= damage
 
-while play == True:
-	bturn = random.randint(1,6)
-	damagedealt = random.randint(2,10)
-	plushp = random.randint(5,12)
-	plusbhp = random.randint(3,7)
-	damagetaken = random.randint(1,8)
-	
-	if hp > 0 or bosshp > 0:
-		if hp > 0:
-			menu()
-			prompt = input().upper()
-			if prompt == "ATTACK":
-				if bturn != 5:
-					bosshp = bosshp - attack()
-				sleep(1)
-			elif prompt == "DEFEND":
-				defend()
-				sleep(1)
-			elif prompt == "HEAL":
-				replit.clear()
-				heal()
-				hp = hp + plushp
-				if hp > maxhealth:
-					hp = maxhealth
-				sleep(1)
-		else:
-			break
-		
-		if bosshp > 0:
-			if bturn < 5:
-				battack()
-				if prompt != "DEFEND":
-					hp = hp - damagetaken
-				sleep(1)
-				replit.clear()
-			elif bturn == 5:
-				bdefend()
-				sleep(1)
-			elif bturn == 6:
-				bheal()
-				bosshp = bosshp + plusbhp
-				if bosshp > bhealthmax:
-					bosshp = bhealthmax
-				sleep(1)
-		else:
-			break
-		
-	else:
-		play = False
-		break
+    elif player_action == "D":  # Defend
+        clear_screen()
+        print("You brace for impact, reducing damage next turn.")
 
-print("Your Health: {}".format(hp))
-print("Enemy Health: {}".format(bosshp))
+    elif player_action == "H":  # Heal
+        heal_amount = random.randint(8, 15)
+        player_hp += heal_amount
+        if player_hp > max_hp:
+            player_hp = max_hp
+        clear_screen()
+        print(f"You heal for {heal_amount} HP!")
+    else:
+        print("Invalid input! Choose A, D, or H.")
+        sleep(1)
+        continue
 
-if bosshp <= 0:
-	print("You Win!")
-elif hp <= 0:
-	print("You Lose!")
+    sleep(1)
+
+    # Boss's Turn (if still alive)
+    if boss_hp > 0:
+        boss_action = random.randint(1, 6)
+
+        if boss_action <= 4:  # Attack (66% chance)
+            boss_damage = random.randint(4, 10)
+            if player_action == "D":  # Reduce damage if player defended
+                boss_damage = max(1, boss_damage - random.randint(2, 6))
+                print("You block some of the damage!")
+            print(f"The boss attacks you for {boss_damage} damage!")
+            player_hp -= boss_damage
+
+        elif boss_action == 5:  # Defend (16% chance)
+            print("The boss prepares to block your next attack!")
+
+        else:  # Heal (16% chance)
+            boss_heal = random.randint(5, 10)
+            boss_hp += boss_heal
+            if boss_hp > boss_max_hp:
+                boss_hp = boss_max_hp
+            print(f"The boss regenerates {boss_heal} HP!")
+
+        sleep(1)
+
+    # Check for win/lose conditions
+    if boss_hp <= 0:
+        clear_screen()
+        print("You defeated the boss! Congratulations!")
+        break
+    elif player_hp <= 0:
+        clear_screen()
+        print("You have been defeated... Good luck next time!")
+        break
+
+# End of game
+print("\nThanks for playing!")
