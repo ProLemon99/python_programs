@@ -27,6 +27,8 @@ sentences = [
     "Artificial intelligence is the future",
     "Typing tests are a fun way to improve your skills",
     "Consistency is the key to success"
+    "Thick of it is a terrible song"
+    "Pineapple does not belong on pizza"
 ]
 
 # Select a random sentence
