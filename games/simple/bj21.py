@@ -1,105 +1,109 @@
+# Currently kind of bugged but still somewhat playable
+
 import random
 
+# Global flag to track if rules were declined
+rules_declined = False
+
 def rules():
-    print("\n***********************")
-    print("* Blackjack / 21 Rules *")
-    print("***********************")
+    """Display the game rules"""
+    print("\n" + "-" * 25)
+    print("*    Blackjack / 21 Rules    *")
+    print("-" * 25)
     print("\nObjective:")
-    print("The goal of Blackjack is to have a hand value closer to 21 than the dealer's hand, without exceeding 21.")
+    print("The goal is to have a hand value closer to 21 than the dealer's hand,")
+    print("without exceeding 21.")
+    
     print("\nCard Values:")
-    print("- Number cards (2 through 10) are worth their face value.")
-    print("- Face cards (Jack, Queen, King) are each worth 10 points.")
-    print("- Aces can be worth 1 or 11 points, depending on which value benefits the hand more.")
+    print("- Number cards (2-10): Face value")
+    print("- Face cards (J, Q, K): 10 points")
+    print("- Aces: 1 or 11 points (whichever benefits the hand)")
+    
     print("\nGameplay:")
-    print("1. Each player, including the dealer, is dealt two cards.")
-    print("2. Players are allowed to 'hit' (take another card) or 'stand' (keep their current hand).")
-    print("3. Players can continue to hit until they decide to stand or until their hand exceeds 21, resulting in a 'bust' and an automatic loss.")
-    print("4. After all players have completed their turn, the dealer reveals their face-down card.")
-    print("5. The dealer must hit until their hand reaches at least 17. ")
-    print("6. If the dealer busts, all remaining players win.")
-    print("7. If the dealer doesn't bust, the player's hands are compared to the dealer's hand.")
-    print("8. The player wins if their hand is closer to 21 than the dealer's without busting.\n")
+    print("1. Each player gets two cards (dealer has one hidden)")
+    print("2. Hit (take another card) or Stand (keep current hand)")
+    print("3. Continue hitting until you Stand or Bust (>21)")
+    print("4. Dealer reveals cards and hits until reaching 17+")
+    print("5. Closest to 21 without busting wins\n")
 
-def ace(a):
-    """If first element is 'A' it converts it into 11\n
-    and if any other element is 'A' it converts it into '1' or '11' based on sum of list such that sum<=21
-    """
-    for i in a:
-        if a[0] == "A":
-            a[0] = 11
+def ace(hand):
+    """Adjust Ace values in the hand"""
+    for i, card in enumerate(hand):
+        if i == 0 and card == "A":
+            hand[0] = 11
+        elif card == "A" and hand[0] != "A":
+            hand[-1] = 1 if sum(hand[:-1]) > 10 else 11
 
-        elif i == "A" and a[0] != "A":
-            if sum(a[:-1]) > 10:
-                a[-1] = 1
+def is_valid_hand(hand):
+    """Check if hand value is <= 21"""
+    return sum(hand) <= 21
+
+def blackjack(user_hand, dealer_hand):
+    """Main game logic"""
+    # Initial deal
+    ace(user_hand)
+    user_sum = sum(user_hand)
+    print(f"\nYou have {user_hand}. Sum = {user_sum}")
+    ace(dealer_hand)
+    print(f"Dealer has {dealer_hand} and one mystery card")
+
+    # Player turn
+    while True:
+        choice = input("Hit (h) or Stand (s)?\n-> ").lower()
+        if choice == 'h':
+            user_hand.append(random.choice(cards))
+            ace(user_hand)
+            if is_valid_hand(user_hand):
+                print(f"You have {user_hand}. Sum = {sum(user_hand)}")
             else:
-                a[-1] = 11
-
-def test(a):
-    """Checks if the sum of elements in the list is greater than 21 or not\n
-    if sum > 21, returns 'False',\n
-    else returns 'True
-    """
-    if sum(a) > 21:
-        return False
-    else:
-        return True
-
-def blackjack(user_list, computer_list):
-    ace(user_list)
-    user_sum = sum(user_list)
-    print(f"\nYou have {user_list}. sum = {user_sum}")
-
-    ace(computer_list)
-    print(f"Dealer has {computer_list} and one mystery card, sum = ?")
-
-    hit_status = True
-    while hit_status:
-        user_next_move = input("Would you like to hit(h) or stand(s)?:\n->>").lower()
-        if user_next_move == 'h':
-            user_list.append(random.choice(list))
-            ace(user_list)
-            if test(user_list):
-                print(f"You have {user_list}. sum = {sum(user_list)}")
-            elif not test(user_list):
-                print(f"Busts!! You have {user_list}. sum = {sum(user_list)} \n ***** You have lost :(")
+                print(f"Bust! {user_hand}. Sum = {sum(user_hand)}\nYou lose!")
                 return
-        elif user_next_move == 's':
-            print(f"You have {user_list}. sum = {sum(user_list)}")
-            hit_status = False
+        elif choice == 's':
+            print(f"You stand with {sum(user_hand)}")
+            break
         else:
-            print("Wrong input")
+            print("Invalid input")
             return
 
-    if sum(user_list) == 21:
-        print(f"You have sum = {sum(user_list)} and dealer has sum = {sum(computer_list)} \n ***** You have won!!")
-
-    while sum(computer_list) <= 17:
-        computer_list.append(random.choice(list))
-        ace(computer_list)
-    if test(computer_list):
-        print(f"dealer has {computer_list}. sum = {sum(computer_list)}")
+    # Dealer turn
+    while sum(dealer_hand) <= 17:
+        dealer_hand.append(random.choice(cards))
+        ace(dealer_hand)
+    
+    print(f"\nDealer has {dealer_hand}. Sum = {sum(dealer_hand)}")
+    
+    # Determine winner
+    user_sum = sum(user_hand)
+    dealer_sum = sum(dealer_hand)
+    
+    if not is_valid_hand(dealer_hand):
+        print("Dealer busts! You win!")
+    elif user_sum > dealer_sum:
+        print(f"You win! {user_sum} vs {dealer_sum}")
+    elif user_sum < dealer_sum:
+        print(f"You lose! {user_sum} vs {dealer_sum}")
     else:
-        print(f"Busts!! dealer has {computer_list}. sum = {sum(computer_list)} \n ***** You have won!!")
-        return
+        print(f"Push! {user_sum} vs {dealer_sum}")
 
-    if sum(user_list) > sum(computer_list):
-        print(f"You have sum = {sum(user_list)} and dealer has sum = {sum(computer_list)} \n ***** You have won!!")
-    elif sum(user_list) < sum(computer_list):
-        print(f"You have sum = {sum(user_list)} and dealer has sum = {sum(computer_list)} \n ***** You have lost :(")
-    else:
-        print(f"You have sum = {sum(user_list)} and dealer has sum = {sum(computer_list)} \n ***** You have drawn :|")
+# Game setup
+cards = (2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, "A")
+print("Welcome to Blackjack 21!")
 
-# Main
-list = (2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, "A")
-print("\n**********\nWelcome to Blackjack / 21")
-
+# Main game loop
 while True:
-    if  input("Enter 's' to start or 'q' to quit\n->>")== "s":
-        if input("Do you wish to see the rules? (y/n)\n->>").lower() == "y":
-            rules()
-        user_list = [random.randint(2, 10), random.choice(list)]
-        computer_list = [random.choice(list)]
-
-        blackjack(user_list = user_list, computer_list = computer_list)
-    else:
+    choice = input("\nStart (s) or Quit (q)?\n-> ").lower()
+    if choice == "s":
+        # Only offer rules if they were never declined before
+        if not rules_declined:
+            see_rules = input("See rules? (y/n)\n-> ").lower()
+            if see_rules == "y":
+                rules()
+            else:
+                rules_declined = True  # Player declined, don't ask again
+        user_hand = [random.choice(cards), random.choice(cards)]
+        dealer_hand = [random.choice(cards)]
+        blackjack(user_hand, dealer_hand)
+    elif choice == "q":
         break
+    else:
+        print("Invalid input")
